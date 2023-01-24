@@ -1,0 +1,35 @@
+server:
+  port: 9090
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+  cloud:
+    function:
+      definitions: consumerBatch
+    stream:
+      binders:
+        kafka:
+          environment:
+            spring:
+              cloud:
+                stream:
+                  kafka:
+                    bindings:
+                      consumerBatch-in-0:
+                        consumer:
+                          configuration:
+                            max.poll.records: 10
+                            fetch.max.wait.ms: 3000
+                            fetch.min.bytes: 1000000
+                      producerBatch-out-0:
+                        producer:
+                          configuration:
+                            linger.ms: 1000
+      output-bindings: producerBatch
+      bindings:
+        producerBatch-out-0:
+          destination: destination.topic
+        consumerBatch-in-0:
+          destination: destination.topic
+          consumer:
+            batch-mode: true          
