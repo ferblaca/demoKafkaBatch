@@ -20,7 +20,7 @@ spring:
                           configuration:
                             value.serializer: org.apache.kafka.common.serialization.StringSerializer
                             linger.ms: 0
-#      output-bindings: producer-partition-expression-out-0
+      output-bindings: producer-partition-expression-out-0
       bindings:
         producer-partition-expression-out-0:
           destination: destination.topic
