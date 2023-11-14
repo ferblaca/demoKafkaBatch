@@ -5,7 +5,7 @@ spring:
     bootstrap-servers: localhost:9092
   cloud:
     function:
-      definitions: consumerBatch
+      definitions: consumer
     stream:
       binders:
         kafka:
@@ -15,21 +15,19 @@ spring:
                 stream:
                   kafka:
                     bindings:
-                      consumerBatch-in-0:
-                        consumer:
-                          configuration:
-                            max.poll.records: 10
-                            fetch.max.wait.ms: 3000
-                            fetch.min.bytes: 1000000
-                      producerBatch-out-0:
+                      producer-partition-expression-out-0:
                         producer:
                           configuration:
-                            linger.ms: 1000
-      output-bindings: producerBatch
+                            value.serializer: org.apache.kafka.common.serialization.StringSerializer
+                            linger.ms: 0
+#      output-bindings: producer-partition-expression-out-0
       bindings:
-        producerBatch-out-0:
+        producer-partition-expression-out-0:
           destination: destination.topic
-        consumerBatch-in-0:
-          destination: destination.topic
-          consumer:
-            batch-mode: true          
+          content-type: text/plain
+          producer:
+            partition-key-expression: headers['partitionKey']
+            use-native-encoding: true
+            partition-count: 10
+        consumer-in-0:
+          destination: destination.topic      
