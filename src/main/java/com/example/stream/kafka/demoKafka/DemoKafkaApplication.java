@@ -1,4 +1,4 @@
-package com.example.stream.kafka.demoKafkaBatch;
+package com.example.stream.kafka.demoKafka;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
