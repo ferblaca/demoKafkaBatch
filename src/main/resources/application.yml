@@ -1,8 +1,26 @@
 server:
   port: 9090
+
+management:
+  otlp:
+    tracing:
+      sampler:
+        probability: 1.0
+      sender:
+        type: grpc
+      endpoint: http://localhost:4317/v2/spans
+      compression: gzip
+      timeout: 10s
+
 spring:
+  docker:
+    compose:
+      skip:
+        in-tests: false
+      file: "file:@project.basedir@/src/test/resources/compose/docker-compose.yml"
+      lifecycle-management: start-and-stop
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: localhost:19092
   cloud:
     function:
       definitions: consumerBatch
@@ -14,6 +32,8 @@ spring:
               cloud:
                 stream:
                   kafka:
+                    binder:
+                      enableObservation: true
                     bindings:
                       consumerBatch-in-0:
                         consumer:
@@ -21,15 +41,21 @@ spring:
                             max.poll.records: 10
                             fetch.max.wait.ms: 3000
                             fetch.min.bytes: 1000000
-                      producerBatch-out-0:
+                      producer-batch-out-0:
                         producer:
                           configuration:
                             linger.ms: 1000
-      output-bindings: producerBatch
+      #      output-bindings: producer-batch-out-0;producer-single-out-0
       bindings:
-        producerBatch-out-0:
-          destination: destination.topic
+        producer-batch-out-0:
+          destination: destination.batch.topic
         consumerBatch-in-0:
-          destination: destination.topic
+          destination: destination.batch.topic
+          group: consumer-group-batch
           consumer:
-            batch-mode: true          
+            batch-mode: true
+        producer-single-out-0:
+          destination: destination.topic            
+        consumerSingle-in-0:
+          destination: destination.topic
+          group: consumer-group-single
